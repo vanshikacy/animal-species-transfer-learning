@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
 
-from PIL import Image
-
 from torchvision.models import efficientnet_b0
 from torchvision.models import EfficientNet_B0_Weights
 
@@ -36,33 +34,44 @@ model=model.to(device)
 loaded_weights=torch.load("models/best_model.pth", map_location=device)
 model.load_state_dict(loaded_weights) 
 
-image=Image.open(
-    r"data\test-img\African_Bush_Elephant.jpg.webp"
-).convert("RGB")
+# old way-
+# image=Image.open(
+#     r"data\test-img\African_Bush_Elephant.jpg.webp"
+# ).convert("RGB")
+# image=weights.transforms()(image)
+# image=image.unsqueeze(0)
+# images=image.to(device) 
+# model.eval()
+# with torch.no_grad():
+#     outputs=model(image) 
+#     _, predicted=torch.max(outputs, dim=1)
+#     predicted_class=class_names[predicted.item()]
+#     probabilities=torch.softmax(outputs, dim=1)
+#     confidence=probabilities[0][predicted.item()]*100
+#     print(f"predicted class: {predicted_class}")
+#     print(f"Confidence: {confidence:.2f}%")
 
-image=weights.transforms()(image)
+# new way-
+def predict_image(ip_image): # api will handle image.open
+    image=weights.transforms()(ip_image)
+    image=image.unsqueeze(0)
+    image_tensor=image.to(device)
 
-image=image.unsqueeze(0)
+    model.eval()
 
-images=image.to(device) 
+    with torch.no_grad():
+        outputs=model(image_tensor)
+        _, predicted=torch.max(outputs, dim=1)
 
-model.eval()
+        predicted_class=class_names[predicted.item()]
 
-with torch.no_grad():
+        probabilities=torch.softmax(outputs, dim=1)
+        confidence=probabilities.max().item()
     
-    outputs=model(image)
-    
-    _, predicted=torch.max(outputs, dim=1)
-
-    predicted_class=class_names[predicted.item()]
-
-    probabilities=torch.softmax(outputs, dim=1)
-    confidence=probabilities[0][predicted.item()]*100
-
-    print(f"predicted class: {predicted_class}")
-    print(f"Confidence: {confidence:.2f}%")
-
-
+    return {
+        "class_name": predicted_class,
+        "confidence": round(confidence, 4)
+    }
 
     
 
