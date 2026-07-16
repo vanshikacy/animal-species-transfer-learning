@@ -2,7 +2,7 @@
 
 Classifying animal species from images using transfer learning with EfficientNet-B0 and PyTorch.
 
-**Live API:** *Coming soon*
+**Live API:** [Link](https://animal-species-transfer-learning.onrender.com/docs)
 
 ---
 
