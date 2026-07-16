@@ -6,7 +6,7 @@ venv/
 
 .env
 
-models/*.pth
+# models/*.pth
 
 data/
 
